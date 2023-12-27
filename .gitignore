@@ -1,5 +1,6 @@
 cc65/
 build/
+tools/
 *.lnk
 *.lua
 *.ini
