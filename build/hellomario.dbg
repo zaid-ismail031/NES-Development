@@ -1,7 +1,7 @@
 version	major=2,minor=0
 info	csym=0,file=2,lib=0,line=88,mod=1,scope=1,seg=10,span=81,sym=8,type=6
-file	id=0,name="hellomario.asm",size=2290,mtime=0x5E854CE4,mod=0
-file	id=1,name="hellomario.chr",size=8192,mtime=0x5E854CE4,mod=0
+file	id=0,name="..\source\hellomario.asm",size=2290,mtime=0x658C3CCB,mod=0
+file	id=1,name="..\source/hellomario.chr",size=8192,mtime=0x658C3C8C,mod=0
 line	id=0,file=0,line=104,span=65
 line	id=1,file=0,line=30,span=18
 line	id=2,file=0,line=19,span=12
