@@ -1,3 +1,4 @@
 cc65/
 build/
 *.lnk
+*.lua
