@@ -10,9 +10,12 @@
 .byte $00
 .byte $00, $00, $00, $00, $00 ; filler bytes
 .segment "ZEROPAGE" ; LSB 0 - FF
-.segment "STARTUP"
+buttons1: .res 1
+buttons2: .res 1
 
-MAXENTITIES = 10
+spriteX: .res 1
+
+.segment "STARTUP"
 
 
 ;-----------------------------------------------------------------------------------------------------------------------------
@@ -117,7 +120,59 @@ Loop:
 NMI:
     LDA #$02 ; copy sprite data from $0200 => PPU memory for display
     STA $4014
+
+    JSR ReadController1  ; get the current button data for player 1
+    JSR ReadController2  ; get the current button data for player 2
+
+    JSR MoveSprite
+
     RTI
+
+
+;-----------------------------------------------------------------------------------------------------------------------------
+
+ReadController1:
+  LDA #$01
+  STA $4016
+  LDA #$00
+  STA $4016
+  LDX #$08
+ReadController1Loop:
+  LDA $4016
+  LSR A            ; bit0 -> Carry
+  ROL buttons1     ; bit0 <- Carry
+  DEX
+  BNE ReadController1Loop
+  RTS
+  
+ReadController2:
+  LDA #$01
+  STA $4016
+  LDA #$00
+  STA $4016
+  LDX #$08
+ReadController2Loop:
+  LDA $4017
+  LSR A            ; bit0 -> Carry
+  ROL buttons2     ; bit0 <- Carry
+  DEX
+  BNE ReadController2Loop
+  RTS  
+
+;-----------------------------------------------------------------------------------------------------------------------------
+
+MoveSprite:
+    LDX buttons1
+    CPX #%01000000 ; Check if the A button is pressed 
+    BEQ MoveSpriteRight
+    RTS
+
+MoveSpriteRight:
+    LDX spriteX
+    INX
+    STX $0203
+    STX spriteX
+    RTS
 
 ;-----------------------------------------------------------------------------------------------------------------------------
 
