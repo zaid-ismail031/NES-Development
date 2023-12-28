@@ -167,12 +167,23 @@ MoveSprite:
     BEQ MoveSpriteRight
     RTS
 
+; Sprite X location is stored at $0203 (and then every 4th address after)
+; So we create a loop, updating the X location for all 20 sprites that make up Mario
 MoveSpriteRight:
-    LDX spriteX
-    INX
-    STX $0203
-    STX spriteX
-    RTS
+    CLC
+    LDX #$0
+    :
+        LDA $0203, X
+        ADC #$1
+        STA $0203, X
+        
+        INX
+        INX
+        INX
+        INX
+        CPX #$80
+        BNE :-
+        RTS
 
 ;-----------------------------------------------------------------------------------------------------------------------------
 
