@@ -214,34 +214,45 @@ LoadSecondSprite:
     RTS
 
 SetFirstSpritePointer:
-    LDA SpriteData+1
+    LDA #$1
     STA spritePointer
     JSR LoadSpriteData
     RTS
 
 SetSecondSpritePointer:
-    LDA SpriteData+33
+    LDA #$33
     STA spritePointer
     JSR LoadSpriteData
     RTS
 
 LoadSpriteData:
-    LDA spritePointer
+    LDX spritePointer
+
+    :
+    LDA SpriteData, X
     STA $0201
-    LDA spritePointer+4
+    LDA SpriteData, X
     STA $0205
-    LDA spritePointer+8
+    LDA SpriteData, X
     STA $0209
-    LDA spritePointer+12
+    LDA SpriteData, X
     STA $0213
-    LDA spritePointer+16
+    LDA SpriteData, X
     STA $0217
-    LDA spritePointer+20
+    LDA SpriteData, X
     STA $0221
-    LDA spritePointer+24
+    LDA SpriteData, X
     STA $0225
-    LDA spritePointer+28
+    LDA SpriteData, X
     STA $0229
+
+    INX
+    INX
+    INX
+    INX
+
+    CPX spritePointer
+    BNE :-
 
     RTS
 
