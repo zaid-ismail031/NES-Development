@@ -12,8 +12,9 @@
 .segment "ZEROPAGE" ; LSB 0 - FF
 buttons1: .res 1
 buttons2: .res 1
+spritePointer: .res 1
 
-spriteX: .res 1
+SRITEPAGE = $200
 
 .segment "STARTUP"
 
@@ -94,6 +95,9 @@ LoadPalettes:
 ;-----------------------------------------------------------------------------------------------------------------------------
 
 LoadSprites:
+    LDA SpriteData+1
+    STA spritePointer
+
     LDA SpriteData, X
     STA $0200, X
     INX
@@ -123,7 +127,6 @@ NMI:
 
     JSR ReadController1  ; get the current button data for player 1
     JSR ReadController2  ; get the current button data for player 2
-
     JSR MoveSprite
 
     RTI
@@ -165,11 +168,13 @@ MoveSprite:
     LDX buttons1
     CPX #%01000000 ; Check if the A button is pressed 
     BEQ MoveSpriteRight
+    BNE SetFirstSpritePointer
     RTS
 
 ; Sprite X location is stored at $0203 (and then every 4th address after)
 ; So we create a loop, updating the X location for all 20 sprites that make up Mario
 MoveSpriteRight:
+    JSR SetSecondSpritePointer
     CLC
     LDX #$0
     :
@@ -185,6 +190,61 @@ MoveSpriteRight:
         BNE :-
         RTS
 
+
+LoadFirstSprite:
+    LDX #$0
+
+    :
+    LDA SpriteData, X
+    STA $0200, X
+    INX
+    CPX #$20
+    BNE :-
+    RTS 
+
+LoadSecondSprite:
+    LDX #$0
+
+    :
+    LDA SpriteData+32, X
+    STA $0200, X
+    INX
+    CPX #$20
+    BNE :-
+    RTS
+
+SetFirstSpritePointer:
+    LDA SpriteData+1
+    STA spritePointer
+    JSR LoadSpriteData
+    RTS
+
+SetSecondSpritePointer:
+    LDA SpriteData+33
+    STA spritePointer
+    JSR LoadSpriteData
+    RTS
+
+LoadSpriteData:
+    LDA spritePointer
+    STA $0201
+    LDA spritePointer+4
+    STA $0205
+    LDA spritePointer+8
+    STA $0209
+    LDA spritePointer+12
+    STA $0213
+    LDA spritePointer+16
+    STA $0217
+    LDA spritePointer+20
+    STA $0221
+    LDA spritePointer+24
+    STA $0225
+    LDA spritePointer+28
+    STA $0229
+
+    RTS
+
 ;-----------------------------------------------------------------------------------------------------------------------------
 
 PaletteData:
@@ -192,19 +252,60 @@ PaletteData:
   .byte $22,$16,$27,$18,$22,$1A,$30,$27,$22,$16,$30,$27,$22,$0F,$36,$17  ;sprite palette data
 
 SpriteData:
-  .byte $08, $00, $00, $08
-  .byte $08, $01, $00, $10
-  .byte $10, $02, $00, $08
-  .byte $10, $03, $00, $10
-  .byte $18, $04, $00, $08
-  .byte $18, $05, $00, $10
-  .byte $20, $06, $00, $08
-  .byte $20, $07, $00, $10
+    ; Foot forward keyframe
+    .byte $08, $00, $00, $08 ;201
+    .byte $08, $01, $00, $10 ;205
+    .byte $10, $02, $00, $08 ;209
+    .byte $10, $03, $00, $10 ;213
+    .byte $18, $04, $00, $08 ;217
+    .byte $18, $05, $00, $10 ;221
+    .byte $20, $06, $00, $08 ;225
+    .byte $20, $07, $00, $10 ;229
+
+    ; Foot down keyframe
+    .byte $08, $08, $00, $08
+    .byte $08, $09, $00, $10
+    .byte $10, $0A, $00, $08
+    .byte $10, $0B, $00, $10
+    .byte $18, $0C, $00, $08
+    .byte $18, $0D, $00, $10
+    .byte $20, $0E, $00, $08
+    .byte $20, $0F, $00, $10
+
+    ; Mid run keyframe
+    .byte $08, $10, $00, $08
+    .byte $08, $11, $00, $10
+    .byte $10, $12, $00, $08
+    .byte $10, $13, $00, $10
+    .byte $18, $14, $00, $08
+    .byte $18, $15, $00, $10
+    .byte $20, $16, $00, $08
+    .byte $20, $17, $00, $10
+
+    ; Scared keyframe
+    .byte $08, $18, $00, $08
+    .byte $08, $19, $00, $10
+    .byte $10, $1A, $00, $08
+    .byte $10, $1B, $00, $10
+    .byte $18, $1C, $00, $08
+    .byte $18, $1D, $00, $10
+    .byte $20, $1E, $00, $08
+    .byte $20, $1F, $00, $10
+
+    ; Jump keyframe
+    .byte $08, $20, $00, $08
+    .byte $08, $21, $00, $10
+    .byte $10, $22, $00, $08
+    .byte $10, $23, $00, $10
+    .byte $18, $24, $00, $08
+    .byte $18, $25, $00, $10
+    .byte $20, $26, $00, $08
+    .byte $20, $27, $00, $10
 
 .segment "VECTORS"
     .word NMI
     .word Reset
-    ; 
+
 .segment "CHARS"
     .incbin "hellomario.chr"
 
