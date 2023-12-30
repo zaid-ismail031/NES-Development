@@ -190,28 +190,7 @@ MoveSpriteRight:
         BNE :-
         RTS
 
-
-LoadFirstSprite:
-    LDX #$0
-
-    :
-    LDA SpriteData, X
-    STA $0200, X
-    INX
-    CPX #$20
-    BNE :-
-    RTS 
-
-LoadSecondSprite:
-    LDX #$0
-
-    :
-    LDA SpriteData+32, X
-    STA $0200, X
-    INX
-    CPX #$20
-    BNE :-
-    RTS
+;-----------------------------------------------------------------------------------------------------------------------------
 
 SetFirstSpritePointer:
     LDA #$1
@@ -220,7 +199,7 @@ SetFirstSpritePointer:
     RTS
 
 SetSecondSpritePointer:
-    LDA #$33
+    LDA #$21
     STA spritePointer
     JSR LoadSpriteData
     RTS
@@ -228,31 +207,61 @@ SetSecondSpritePointer:
 LoadSpriteData:
     LDX spritePointer
 
-    :
     LDA SpriteData, X
     STA $0201
+    INX
+    INX
+    INX
+    INX
+
     LDA SpriteData, X
     STA $0205
+    INX
+    INX
+    INX
+    INX
+
     LDA SpriteData, X
     STA $0209
-    LDA SpriteData, X
-    STA $0213
-    LDA SpriteData, X
-    STA $0217
-    LDA SpriteData, X
-    STA $0221
-    LDA SpriteData, X
-    STA $0225
-    LDA SpriteData, X
-    STA $0229
-
     INX
     INX
     INX
     INX
 
-    CPX spritePointer
-    BNE :-
+    LDA SpriteData, X
+    STA $020D
+    INX
+    INX
+    INX
+    INX
+
+    LDA SpriteData, X
+    STA $0211
+    INX
+    INX
+    INX
+    INX
+
+    LDA SpriteData, X
+    STA $0215
+    INX
+    INX
+    INX
+    INX
+
+    LDA SpriteData, X
+    STA $0219
+    INX
+    INX
+    INX
+    INX
+
+    LDA SpriteData, X
+    STA $021D
+    INX
+    INX
+    INX
+    INX
 
     RTS
 
