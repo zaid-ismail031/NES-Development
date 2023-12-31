@@ -14,7 +14,11 @@ buttons1: .res 1
 buttons2: .res 1
 spritePointer: .res 1
 
-SRITEPAGE = $200
+SPRITEX = 8
+SPRITEY = 80
+
+MUSHROOMX = 80
+MUSHROOMY = 80
 
 .segment "STARTUP"
 
@@ -95,7 +99,7 @@ LoadPalettes:
 ;-----------------------------------------------------------------------------------------------------------------------------
 
 LoadSprites:
-    LDA SpriteData+1
+    LDA #$1
     STA spritePointer
 
     LDA SpriteData, X
@@ -114,6 +118,8 @@ LoadSprites:
     LDA #%00011110
     STA $2001
 
+    LDY #$0
+
 ;-----------------------------------------------------------------------------------------------------------------------------
 
 Loop:
@@ -128,7 +134,9 @@ NMI:
     JSR ReadController1  ; get the current button data for player 1
     JSR ReadController2  ; get the current button data for player 2
     JSR MoveSprite
-
+    JSR LoadSpriteData
+    ;JSR InitializeMushroom
+    
     RTI
 
 
@@ -168,13 +176,12 @@ MoveSprite:
     LDX buttons1
     CPX #%01000000 ; Check if the A button is pressed 
     BEQ MoveSpriteRight
-    BNE SetFirstSpritePointer
     RTS
 
 ; Sprite X location is stored at $0203 (and then every 4th address after)
 ; So we create a loop, updating the X location for all 20 sprites that make up Mario
 MoveSpriteRight:
-    JSR SetSecondSpritePointer
+    LDA #$0
     CLC
     LDX #$0
     :
@@ -188,6 +195,7 @@ MoveSpriteRight:
         INX
         CPX #$80
         BNE :-
+        JSR ANIMATION
         RTS
 
 ;-----------------------------------------------------------------------------------------------------------------------------
@@ -195,13 +203,13 @@ MoveSpriteRight:
 SetFirstSpritePointer:
     LDA #$1
     STA spritePointer
-    JSR LoadSpriteData
     RTS
 
 SetSecondSpritePointer:
     LDA #$21
     STA spritePointer
-    JSR LoadSpriteData
+    CPY #$10
+    BEQ ResetY
     RTS
 
 LoadSpriteData:
@@ -265,7 +273,91 @@ LoadSpriteData:
 
     RTS
 
+;InitializeMushroom:
+;    LDX #$40
+;    LDA SpriteData, X
+;    STA $0221, X
+;    INX
+;    CPX #$60
+;    BNE InitializeMushroom
+;    RTS
+;
+;
+;LoadMushroom:
+;    LDX #$41
+;
+;    LDA SpriteData, X
+;    STA $0221
+;    INX
+;    INX
+;    INX
+;    INX
+;
+;    LDA SpriteData, X
+;    STA $0225
+;    INX
+;    INX
+;    INX
+;    INX
+;
+;    LDA SpriteData, X
+;    STA $0229
+;    INX
+;    INX
+;    INX
+;    INX
+;
+;    LDA SpriteData, X
+;    STA $022D
+;    INX
+;    INX
+;    INX
+;    INX
+;
+;    LDA SpriteData, X
+;    STA $0231
+;    INX
+;    INX
+;    INX
+;    INX
+;
+;    LDA SpriteData, X
+;    STA $0235
+;    INX
+;    INX
+;    INX
+;    INX
+;
+;    LDA SpriteData, X
+;    STA $0239
+;    INX
+;    INX
+;    INX
+;    INX
+;
+;    LDA SpriteData, X
+;    STA $024D
+;    INX
+;    INX
+;    INX
+;    INX
+;
+;    RTS
+
+
 ;-----------------------------------------------------------------------------------------------------------------------------
+
+ANIMATION:
+    INY
+    CPY #$5
+    BCC SetFirstSpritePointer
+    BEQ SetSecondSpritePointer
+    JSR SetSecondSpritePointer
+    RTS
+
+ResetY:
+    LDY #$0
+    RTS
 
 PaletteData:
   .byte $22,$29,$1A,$0F,$22,$36,$17,$0f,$22,$30,$21,$0f,$22,$27,$17,$0F  ;background palette data
@@ -273,54 +365,34 @@ PaletteData:
 
 SpriteData:
     ; Foot forward keyframe
-    .byte $08, $00, $00, $08 ;201
-    .byte $08, $01, $00, $10 ;205
-    .byte $10, $02, $00, $08 ;209
-    .byte $10, $03, $00, $10 ;213
-    .byte $18, $04, $00, $08 ;217
-    .byte $18, $05, $00, $10 ;221
-    .byte $20, $06, $00, $08 ;225
-    .byte $20, $07, $00, $10 ;229
+    .byte SPRITEY, $00, $00, SPRITEX
+    .byte SPRITEY, $01, $00, SPRITEX+8
+    .byte SPRITEY+8, $02, $00, SPRITEX
+    .byte SPRITEY+8, $03, $00, SPRITEX+8
+    .byte SPRITEY+16, $04, $00, SPRITEX
+    .byte SPRITEY+16, $05, $00, SPRITEX+8
+    .byte SPRITEY+24, $06, $00, SPRITEX
+    .byte SPRITEY+24, $07, $00, SPRITEX+8
 
     ; Foot down keyframe
-    .byte $08, $08, $00, $08
-    .byte $08, $09, $00, $10
-    .byte $10, $0A, $00, $08
-    .byte $10, $0B, $00, $10
-    .byte $18, $0C, $00, $08
-    .byte $18, $0D, $00, $10
-    .byte $20, $0E, $00, $08
-    .byte $20, $0F, $00, $10
+    .byte SPRITEY, $08, $00, SPRITEX
+    .byte SPRITEY, $09, $00, SPRITEX+8
+    .byte SPRITEY+8, $0A, $00, SPRITEX
+    .byte SPRITEY+8, $0B, $00, SPRITEX+8
+    .byte SPRITEY+16, $0C, $00, SPRITEX
+    .byte SPRITEY+16, $0D, $00, SPRITEX+8
+    .byte SPRITEY+24, $0E, $00, SPRITEX
+    .byte SPRITEY+24, $0F, $00, SPRITEX+8
 
-    ; Mid run keyframe
-    .byte $08, $10, $00, $08
-    .byte $08, $11, $00, $10
-    .byte $10, $12, $00, $08
-    .byte $10, $13, $00, $10
-    .byte $18, $14, $00, $08
-    .byte $18, $15, $00, $10
-    .byte $20, $16, $00, $08
-    .byte $20, $17, $00, $10
-
-    ; Scared keyframe
-    .byte $08, $18, $00, $08
-    .byte $08, $19, $00, $10
-    .byte $10, $1A, $00, $08
-    .byte $10, $1B, $00, $10
-    .byte $18, $1C, $00, $08
-    .byte $18, $1D, $00, $10
-    .byte $20, $1E, $00, $08
-    .byte $20, $1F, $00, $10
-
-    ; Jump keyframe
-    .byte $08, $20, $00, $08
-    .byte $08, $21, $00, $10
-    .byte $10, $22, $00, $08
-    .byte $10, $23, $00, $10
-    .byte $18, $24, $00, $08
-    .byte $18, $25, $00, $10
-    .byte $20, $26, $00, $08
-    .byte $20, $27, $00, $10
+    ; Mushroom
+    .byte MUSHROOMY, $71, $00, MUSHROOMX
+    .byte MUSHROOMY, $72, $00, MUSHROOMX+8
+    .byte MUSHROOMY+8, $73, $00, MUSHROOMX
+    .byte MUSHROOMY+8, $74, $00, MUSHROOMX+8
+    .byte MUSHROOMY+16, $75, $00, MUSHROOMX
+    .byte MUSHROOMY+16, $76, $00, MUSHROOMX+8
+    .byte MUSHROOMY+24, $77, $00, MUSHROOMX
+    .byte MUSHROOMY+24, $78, $00, MUSHROOMX+8
 
 .segment "VECTORS"
     .word NMI
