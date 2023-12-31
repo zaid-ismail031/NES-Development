@@ -17,9 +17,6 @@ spritePointer: .res 1
 SPRITEX = 8
 SPRITEY = 80
 
-MUSHROOMX = 80
-MUSHROOMY = 80
-
 .segment "STARTUP"
 
 
@@ -135,7 +132,6 @@ NMI:
     JSR ReadController2  ; get the current button data for player 2
     JSR MoveSprite
     JSR LoadSpriteData
-    ;JSR InitializeMushroom
     
     RTI
 
@@ -273,78 +269,6 @@ LoadSpriteData:
 
     RTS
 
-;InitializeMushroom:
-;    LDX #$40
-;    LDA SpriteData, X
-;    STA $0221, X
-;    INX
-;    CPX #$60
-;    BNE InitializeMushroom
-;    RTS
-;
-;
-;LoadMushroom:
-;    LDX #$41
-;
-;    LDA SpriteData, X
-;    STA $0221
-;    INX
-;    INX
-;    INX
-;    INX
-;
-;    LDA SpriteData, X
-;    STA $0225
-;    INX
-;    INX
-;    INX
-;    INX
-;
-;    LDA SpriteData, X
-;    STA $0229
-;    INX
-;    INX
-;    INX
-;    INX
-;
-;    LDA SpriteData, X
-;    STA $022D
-;    INX
-;    INX
-;    INX
-;    INX
-;
-;    LDA SpriteData, X
-;    STA $0231
-;    INX
-;    INX
-;    INX
-;    INX
-;
-;    LDA SpriteData, X
-;    STA $0235
-;    INX
-;    INX
-;    INX
-;    INX
-;
-;    LDA SpriteData, X
-;    STA $0239
-;    INX
-;    INX
-;    INX
-;    INX
-;
-;    LDA SpriteData, X
-;    STA $024D
-;    INX
-;    INX
-;    INX
-;    INX
-;
-;    RTS
-
-
 ;-----------------------------------------------------------------------------------------------------------------------------
 
 ANIMATION:
@@ -358,6 +282,8 @@ ANIMATION:
 ResetY:
     LDY #$0
     RTS
+
+;-----------------------------------------------------------------------------------------------------------------------------
 
 PaletteData:
   .byte $22,$29,$1A,$0F,$22,$36,$17,$0f,$22,$30,$21,$0f,$22,$27,$17,$0F  ;background palette data
@@ -384,15 +310,35 @@ SpriteData:
     .byte SPRITEY+24, $0E, $00, SPRITEX
     .byte SPRITEY+24, $0F, $00, SPRITEX+8
 
-    ; Mushroom
-    .byte MUSHROOMY, $71, $00, MUSHROOMX
-    .byte MUSHROOMY, $72, $00, MUSHROOMX+8
-    .byte MUSHROOMY+8, $73, $00, MUSHROOMX
-    .byte MUSHROOMY+8, $74, $00, MUSHROOMX+8
-    .byte MUSHROOMY+16, $75, $00, MUSHROOMX
-    .byte MUSHROOMY+16, $76, $00, MUSHROOMX+8
-    .byte MUSHROOMY+24, $77, $00, MUSHROOMX
-    .byte MUSHROOMY+24, $78, $00, MUSHROOMX+8
+    ; Mid run keyframe
+    .byte $08, $10, $00, $08
+    .byte $08, $11, $00, $10
+    .byte $10, $12, $00, $08
+    .byte $10, $13, $00, $10
+    .byte $18, $14, $00, $08
+    .byte $18, $15, $00, $10
+    .byte $20, $16, $00, $08
+    .byte $20, $17, $00, $10
+
+    ; Scared keyframe
+    .byte $08, $18, $00, $08
+    .byte $08, $19, $00, $10
+    .byte $10, $1A, $00, $08
+    .byte $10, $1B, $00, $10
+    .byte $18, $1C, $00, $08
+    .byte $18, $1D, $00, $10
+    .byte $20, $1E, $00, $08
+    .byte $20, $1F, $00, $10
+
+    ; Jump keyframe
+    .byte $08, $20, $00, $08
+    .byte $08, $21, $00, $10
+    .byte $10, $22, $00, $08
+    .byte $10, $23, $00, $10
+    .byte $18, $24, $00, $08
+    .byte $18, $25, $00, $10
+    .byte $20, $26, $00, $08
+    .byte $20, $27, $00, $10
 
 .segment "VECTORS"
     .word NMI
